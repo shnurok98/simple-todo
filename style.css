@@ -117,3 +117,47 @@ input[name="new-todo"] {
 .destroy:hover {
 	color: #e41749;
 }
+
+.footer {
+	border-top: 1px solid #EDEDED;
+	background-color: white;
+	font-size: .7em;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.todo-count {
+	margin-left: 10px;
+}
+
+.filters {
+	list-style: none;
+}
+
+.filters li {
+  border: 1px solid transparent;
+	border-radius: 3px;
+	display: inline;
+	padding: 5px;
+	cursor: pointer;
+}
+
+.filters li:hover {
+	border: 1px solid #24809c;
+}
+
+.filters > .selected {
+	border: 1px solid #24809c;
+}
+
+.clear-completed {
+	background: none;
+	border: none;
+	margin-right: 10px;
+	cursor: pointer;
+}
+
+.clear-completed:hover {
+	text-decoration: underline;
+}
