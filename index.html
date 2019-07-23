@@ -12,9 +12,9 @@
 
 	<div class="wrapper">
 
-		<input type="text" name="new-todo" placeholder="just do it">
+		<input type="text" name="new-todo" placeholder="just do it" onkeypress="addTodo(event, this)">
 		<ul class="todo-list">
-			<li>
+			<!-- <li>
 				<input class="toggle" type="checkbox">
 				<label>kek</label>
 				<button class="destroy">×</button>
@@ -24,7 +24,7 @@
 				<label>kek#2</label>
 				<button class="destroy">×</button>
 			</li>
-			<li>3</li>
+			<li>3</li> -->
 		</ul>
 		<div class="footer">
 			<span class="todo-count">2 items left</span>
@@ -33,7 +33,7 @@
 				<li>Active</li>
 				<li>Completed</li>
 			</ul>
-			<button class="clear-completed">Clear completed</button>
+			<button class="clear-completed" onclick="clearCompleted()">Clear completed</button>
 		</div>
 	</div>
 
