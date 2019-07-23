@@ -18,9 +18,14 @@ let todos = [
 
 
 let todoList = document.querySelector('.todo-list');
+let footer = document.querySelector('.footer');
+let todoCount = document.querySelector('.todo-count');
+let filters = document.querySelector('.filters');
+let btnClear = document.querySelector('.clear-completed');
 
 renderTodo(todos);
 
+// filters.addEventListener();
 
 function removeTodo(id) {
 	let arr = [];
@@ -39,18 +44,25 @@ function changeTodo(id) {
 	for (let i = 0; i < todos.length; i++) {
 		if (todos[i].id === id) {
 			todos[i].completed = !todos[i].completed;
+			renderTodo(todos);
 			break;
 		}
 	}
 }
 
 function renderTodo(arr) {
+	let count = 0;
 	todoList.innerHTML = "";
 
 	for (let i = 0; i < arr.length; i++) {
 		let li = document.createElement('li');
 		let checked = "";
-		if (arr[i].completed === true) checked = 'checked';
+
+		if (arr[i].completed === true) {
+			checked = 'checked';
+		} else {
+			count++;
+		};
 
 		li.innerHTML = `
 			<input class="toggle" type="checkbox" ${checked} onchange="changeTodo(${arr[i].id})">
@@ -60,6 +72,10 @@ function renderTodo(arr) {
 
 		todoList.appendChild(li);
 	}
+
+	footer.style.display = arr.length > 0 ? 'flex' : 'none';
+	todoCount.innerHTML = count + ' задач осталось';
+	btnClear.style.visibility = count < arr.length ? 'visible' : 'hidden';
 }
 
 function addTodo(e, input) {

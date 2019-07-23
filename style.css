@@ -124,7 +124,7 @@ input[name="new-todo"] {
 	border-top: 1px solid #EDEDED;
 	background-color: white;
 	font-size: .7em;
-	display: flex;
+	display: none;
 	justify-content: space-between;
 	align-items: center;
 }
@@ -154,6 +154,7 @@ input[name="new-todo"] {
 }
 
 .clear-completed {
+	visibility: hidden;
 	background: none;
 	border: none;
 	margin-right: 10px;
