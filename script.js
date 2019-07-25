@@ -52,10 +52,9 @@ function changeTodo(id) {
 	}
 }
 
-// TODO: считает count для входного массива, а не основного todos (один из выходов изменение todos и использование reduce)
 // TODO: сделать ф. для изменения слова 'задач'
 function renderTodo(filter) {
-	let count = 0;
+	let count = getCountActive(todos);
 	let arr;
 	todoList.innerHTML = "";
 
@@ -65,11 +64,7 @@ function renderTodo(filter) {
 		let li = document.createElement('li');
 		let checked = "";
 
-		if (arr[i].completed === true) {
-			checked = 'checked';
-		} else {
-			count++;
-		};
+		if (arr[i].completed === true) checked = 'checked';
 
 		li.innerHTML = `
 			<input class="toggle" type="checkbox" ${checked} onchange="changeTodo(${arr[i].id})">
@@ -82,7 +77,7 @@ function renderTodo(filter) {
 
 	footer.style.display = todos.length > 0 ? 'flex' : 'none';
 	todoCount.innerHTML = count + ' задач осталось';
-	btnClear.style.visibility = count < arr.length ? 'visible' : 'hidden';
+	btnClear.style.visibility = count < todos.length ? 'visible' : 'hidden';
 }
 
 // TODO: валидация ввода (пробелы, html, ...)
@@ -145,4 +140,12 @@ function filterCompleted(flag){
 	});
 
 	return arr;
+}
+
+function getCountActive(arr) {
+	let count = 0;
+	for (let i = 0; i < arr.length; i++) {
+		if (arr[i].completed === false) count++;
+	}
+	return count;
 }
