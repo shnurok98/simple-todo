@@ -23,7 +23,9 @@ let todoCount = document.querySelector('.todo-count');
 let filters = document.querySelector('.filters');
 let btnClear = document.querySelector('.clear-completed');
 
-renderTodo(todos);
+let currentFilter = "All";
+
+renderTodo();
 
 filters.addEventListener('click', changeFilter, false);
 
@@ -37,26 +39,28 @@ function removeTodo(id) {
 	}
 
 	todos = arr;
-	renderTodo(todos);
+	renderTodo(currentFilter);
 }
 
 function changeTodo(id) {
 	for (let i = 0; i < todos.length; i++) {
 		if (todos[i].id === id) {
 			todos[i].completed = !todos[i].completed;
-			renderTodo(todos);
+			renderTodo(currentFilter);
 			break;
 		}
 	}
 }
 
 // TODO: считает count для входного массива, а не основного todos (один из выходов изменение todos и использование reduce)
-// TODO: показывает кнопку clr при completed = 0 (после того как она уже срабатывала)
 // TODO: сделать ф. для изменения слова 'задач'
-function renderTodo(arr) {
+function renderTodo(filter) {
 	let count = 0;
+	let arr;
 	todoList.innerHTML = "";
 
+	arr = filterTodo(filter);
+	console.log(arr);
 	for (let i = 0; i < arr.length; i++) {
 		let li = document.createElement('li');
 		let checked = "";
@@ -78,10 +82,10 @@ function renderTodo(arr) {
 
 	footer.style.display = todos.length > 0 ? 'flex' : 'none';
 	todoCount.innerHTML = count + ' задач осталось';
-	btnClear.style.visibility = count < todos.length ? 'visible' : 'hidden';
+	btnClear.style.visibility = count < arr.length ? 'visible' : 'hidden';
 }
 
-// TODO: валидация ввода (пустой, html...)
+// TODO: валидация ввода (пробелы, html, ...)
 function addTodo(e, input) {
 	if (e.keyCode !== 13) return;
 
@@ -93,17 +97,16 @@ function addTodo(e, input) {
 
 	todos.push(obj);
 	input.value = "";
-	renderTodo(todos);
+	renderTodo(currentFilter);
 }
 
-// TODO: при вызове использует (и далее подгружает) основной массив и не учитывает фильтр
 function clearCompleted() {
 	// Получаем незавершенные для замены массива
-	let arr = filterTodo(false);
+	let arr = filterCompleted(false);
 
 	todos = arr;
 
-	renderTodo(todos);
+	renderTodo(currentFilter);
 }
 
 function changeFilter(){
@@ -114,21 +117,27 @@ function changeFilter(){
 	oldSelect.classList.toggle('selected');
 	
 	target.classList.toggle('selected');
+	currentFilter = target.textContent;
 
-	switch(target.textContent){
-		case 'All':
-			renderTodo(todos);
-			break;
-		case 'Active':
-			renderTodo(filterTodo(false));
-			break;
-		case 'Completed':
-			renderTodo(filterTodo(true));
-			break;
-	}
+	renderTodo(currentFilter);
 }
 
-function filterTodo(flag){
+function filterTodo(filter) {
+	let arr;
+	switch(filter){
+		case 'Active':
+			arr = filterCompleted(false);
+			break;
+		case 'Completed':
+			arr = filterCompleted(true);
+			break;
+		default:
+			arr = todos;
+	}
+	return arr;
+}
+
+function filterCompleted(flag){
 	let arr = [];
 
 	arr = todos.filter(function(item){

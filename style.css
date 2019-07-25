@@ -36,6 +36,19 @@ input[name="new-todo"] {
 	box-shadow: inset 0 -2px 1px rgba(0,0,0,0.03)
 }
 
+input[name="new-todo"]::-webkit-input-placeholder {
+   font-style: italic;
+}
+input[name="new-todo"]:-ms-input-placeholder {
+   font-style: italic;
+}
+input[name="new-todo"]::-ms-input-placeholder {
+   font-style: italic;
+}
+input[name="new-todo"]::placeholder {
+   font-style: italic;
+}
+
 .todo-list {
 	list-style: none;
 	padding: 0;
