@@ -25,7 +25,7 @@ let btnClear = document.querySelector('.clear-completed');
 
 renderTodo(todos);
 
-// filters.addEventListener();
+filters.addEventListener('click', changeFilter, false);
 
 function removeTodo(id) {
 	let arr = [];
@@ -50,6 +50,9 @@ function changeTodo(id) {
 	}
 }
 
+// TODO: считает count для входного массива, а не основного todos (один из выходов изменение todos и использование reduce)
+// TODO: показывает кнопку clr при completed = 0 (после того как она уже срабатывала)
+// TODO: сделать ф. для изменения слова 'задач'
 function renderTodo(arr) {
 	let count = 0;
 	todoList.innerHTML = "";
@@ -73,11 +76,12 @@ function renderTodo(arr) {
 		todoList.appendChild(li);
 	}
 
-	footer.style.display = arr.length > 0 ? 'flex' : 'none';
+	footer.style.display = todos.length > 0 ? 'flex' : 'none';
 	todoCount.innerHTML = count + ' задач осталось';
-	btnClear.style.visibility = count < arr.length ? 'visible' : 'hidden';
+	btnClear.style.visibility = count < todos.length ? 'visible' : 'hidden';
 }
 
+// TODO: валидация ввода (пустой, html...)
 function addTodo(e, input) {
 	if (e.keyCode !== 13) return;
 
@@ -92,12 +96,44 @@ function addTodo(e, input) {
 	renderTodo(todos);
 }
 
+// TODO: при вызове использует (и далее подгружает) основной массив и не учитывает фильтр
 function clearCompleted() {
-	let arr = todos.filter(function(item){
-		return item.completed !== true;
-	})
+	// Получаем незавершенные для замены массива
+	let arr = filterTodo(false);
 
 	todos = arr;
 
 	renderTodo(todos);
+}
+
+function changeFilter(){
+	let target = event.target.closest('li');
+	if (target === null) return;
+
+	let oldSelect = document.querySelector('.filters .selected');
+	oldSelect.classList.toggle('selected');
+	
+	target.classList.toggle('selected');
+
+	switch(target.textContent){
+		case 'All':
+			renderTodo(todos);
+			break;
+		case 'Active':
+			renderTodo(filterTodo(false));
+			break;
+		case 'Completed':
+			renderTodo(filterTodo(true));
+			break;
+	}
+}
+
+function filterTodo(flag){
+	let arr = [];
+
+	arr = todos.filter(function(item){
+		return item.completed === flag;
+	});
+
+	return arr;
 }

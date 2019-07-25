@@ -1,12 +1,8 @@
 # Простой список дел
 
-## CSS
-  
+## HTML & CSS & JS
+
+TODO: валидация полей  
 TODO: сделать поле для изменения туду  
-TODO: большой todo не вмещается
-
-## JS
-
-TODO: filters через listener (Hoisting). Использовать filter/reduce  
-TODO: функция для count  
+TODO: большой todo не вмещается  
 TODO: поле для изменения todo
