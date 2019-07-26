@@ -49,6 +49,23 @@ input[name="new-todo"]::placeholder {
    font-style: italic;
 }
 
+.edit-todo {
+ 	display: none; 
+	position: absolute;
+	z-index: 1;
+	left: 0px;
+	bottom: 0px;
+	margin-left: 70px;
+	margin-right: 25px;
+   font-size: 1em;
+	box-sizing: border-box;
+	border: none;
+	box-shadow: inset 0 0 2px 2px #D3D6D6FF;
+	border-radius: 4px;
+	padding: .98em;
+	width: 75%;
+}
+
 .todo-list {
 	list-style: none;
 	padding: 0;
@@ -104,7 +121,11 @@ input[name="new-todo"]::placeholder {
 }
 
 .toggle + label {
+	display: inline-block;
+	word-wrap: anywhere;
+	overflow-wrap: anywhere;
 	margin-left: 50px;
+	margin-right: 25px;
 	transition: color .5s;
 }
 
@@ -137,6 +158,7 @@ input[name="new-todo"]::placeholder {
 	border-top: 1px solid #EDEDED;
 	background-color: white;
 	font-size: .7em;
+	color: #777777FF;
 	display: none;
 	justify-content: space-between;
 	align-items: center;
@@ -167,6 +189,7 @@ input[name="new-todo"]::placeholder {
 }
 
 .clear-completed {
+	color: inherit;
 	visibility: hidden;
 	background: none;
 	border: none;

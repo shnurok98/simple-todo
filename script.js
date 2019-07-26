@@ -52,7 +52,6 @@ function changeTodo(id) {
 	}
 }
 
-// TODO: сделать ф. для изменения слова 'задач'
 function renderTodo(filter) {
 	let count = getCountActive(todos);
 	let arr;
@@ -68,15 +67,17 @@ function renderTodo(filter) {
 
 		li.innerHTML = `
 			<input class="toggle" type="checkbox" ${checked} onchange="changeTodo(${arr[i].id})">
-			<label>${arr[i].todo}</label>
+			<label ondblclick="editTodo(event)">${arr[i].todo}</label>
+			<input class="edit-todo" onkeypress="saveTodo(event, this)" type="text" name="edit-todo" value="${arr[i].todo}"/>
 			<button class="destroy" onclick="removeTodo(${arr[i].id})">×</button>
 		`;
 
 		todoList.appendChild(li);
+
 	}
 
 	footer.style.display = todos.length > 0 ? 'flex' : 'none';
-	todoCount.innerHTML = count + ' задач осталось';
+	todoCount.innerHTML = `${count} ${getWordItem(count)} left`;
 	btnClear.style.visibility = count < todos.length ? 'visible' : 'hidden';
 }
 
@@ -148,4 +149,31 @@ function getCountActive(arr) {
 		if (arr[i].completed === false) count++;
 	}
 	return count;
+}
+
+function getWordItem(n) {
+	if (n === 1) {
+		return 'item'
+	} else {
+		return 'items'
+	}
+}
+
+function editTodo(e) {
+	let input = e.target.nextElementSibling;
+	input.style.display = "block";
+}
+
+function saveTodo(e, input) {
+	if (e.keyCode !== 13) return;
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// let obj = {
+	// 	id: todos.length + 1,
+	// 	todo: input.value,
+	// 	completed: false
+	// };
+
+	// todos.push(obj);
+	// input.value = "";
+	// renderTodo(currentFilter);
 }
