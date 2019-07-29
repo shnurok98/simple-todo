@@ -68,7 +68,7 @@ function renderTodo(filter) {
 		li.innerHTML = `
 			<input class="toggle" type="checkbox" ${checked} onchange="changeTodo(${arr[i].id})">
 			<label ondblclick="editTodo(event)">${arr[i].todo}</label>
-			<input class="edit-todo" onkeypress="saveTodo(event, this)" type="text" name="edit-todo" value="${arr[i].todo}"/>
+			<input class="edit-todo" onkeypress="saveTodo(event, this)" onblur="blurInTodo(this)" data-todoId="${arr[i].id}" type="text" name="edit-todo" value="${arr[i].todo}"/>
 			<button class="destroy" onclick="removeTodo(${arr[i].id})">×</button>
 		`;
 
@@ -159,6 +159,15 @@ function getWordItem(n) {
 	}
 }
 
+function setTodoById(id, todo) {
+	for (let i = 0; i < todos.length; i++) {
+		if (todos[i].id === id) {
+			todos[i].todo = todo;
+			break;
+		}
+	}
+}
+
 function editTodo(e) {
 	let input = e.target.nextElementSibling;
 	input.style.display = "block";
@@ -166,14 +175,16 @@ function editTodo(e) {
 
 function saveTodo(e, input) {
 	if (e.keyCode !== 13) return;
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// let obj = {
-	// 	id: todos.length + 1,
-	// 	todo: input.value,
-	// 	completed: false
-	// };
+	
+	setTodoById(Number(input.dataset.todoid), input.value);
+	
+	input.style.display = "none";
+	renderTodo(currentFilter);
+}
 
-	// todos.push(obj);
-	// input.value = "";
-	// renderTodo(currentFilter);
+function blurInTodo(input) {
+	setTodoById(Number(input.dataset.todoid), input.value);
+	
+	input.style.display = "none";
+	renderTodo(currentFilter);
 }

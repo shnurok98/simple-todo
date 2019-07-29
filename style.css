@@ -64,6 +64,7 @@ input[name="new-todo"]::placeholder {
 	border-radius: 4px;
 	padding: .98em;
 	width: 75%;
+	height: 100%;
 }
 
 .todo-list {
@@ -121,6 +122,7 @@ input[name="new-todo"]::placeholder {
 }
 
 .toggle + label {
+	width: 80%;
 	display: inline-block;
 	word-wrap: anywhere;
 	overflow-wrap: anywhere;
