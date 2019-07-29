@@ -58,7 +58,7 @@ function renderTodo(filter) {
 	todoList.innerHTML = "";
 
 	arr = filterTodo(filter);
-	console.log(arr);
+	
 	for (let i = 0; i < arr.length; i++) {
 		let li = document.createElement('li');
 		let checked = "";
@@ -85,9 +85,12 @@ function renderTodo(filter) {
 function addTodo(e, input) {
 	if (e.keyCode !== 13) return;
 
+	todoText = validTodo(input.value);
+	if (todoText === '') return;
+
 	let obj = {
 		id: todos.length + 1,
-		todo: input.value,
+		todo: todoText,
 		completed: false
 	};
 
@@ -152,11 +155,7 @@ function getCountActive(arr) {
 }
 
 function getWordItem(n) {
-	if (n === 1) {
-		return 'item'
-	} else {
-		return 'items'
-	}
+	return n === 1 ? 'item': 'items';
 }
 
 function setTodoById(id, todo) {
@@ -171,20 +170,41 @@ function setTodoById(id, todo) {
 function editTodo(e) {
 	let input = e.target.nextElementSibling;
 	input.style.display = "block";
+	input.focus();
 }
 
 function saveTodo(e, input) {
 	if (e.keyCode !== 13) return;
 	
-	setTodoById(Number(input.dataset.todoid), input.value);
+	todoText = validTodo(input.value);
+	if (todoText === '') return;
+
+	setTodoById(Number(input.dataset.todoid), todoText);
 	
 	input.style.display = "none";
 	renderTodo(currentFilter);
 }
 
 function blurInTodo(input) {
-	setTodoById(Number(input.dataset.todoid), input.value);
+	todoText = validTodo(input.value);
+	if (todoText === '') return;
+
+	setTodoById(Number(input.dataset.todoid), todoText);
 	
 	input.style.display = "none";
 	renderTodo(currentFilter);
+}
+
+function validTodo(text) {
+	text = text.trim();
+
+	let map = {
+		'&': '&amp;',
+   	'<': '&lt;',
+   	'>': '&gt;',
+   	'"': '&quot;',
+   	"'": '&#039;'
+	};
+
+	return text.replace(/[&<>'"]/g, function(n) { return map[n]; });
 }
