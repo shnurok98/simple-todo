@@ -176,16 +176,14 @@ function editTodo(e) {
 function saveTodo(e, input) {
 	if (e.keyCode !== 13) return;
 	
-	todoText = validTodo(input.value);
-	if (todoText === '') return;
-
-	setTodoById(Number(input.dataset.todoid), todoText);
-	
-	input.style.display = "none";
-	renderTodo(currentFilter);
+	saveEdited(input);
 }
 
 function blurInTodo(input) {
+	saveEdited(input);
+}
+
+function saveEdited(input) {
 	todoText = validTodo(input.value);
 	if (todoText === '') return;
 
