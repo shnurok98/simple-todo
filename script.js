@@ -32,10 +32,10 @@ filters.addEventListener('click', changeFilter, false);
 function removeTodo(id) {
 	let arr = [];
 
-	for (let i = 0; i < todos.length; i++) {
-		if (todos[i].id === id) continue;
+	for (let elm of todos){
+		if (elm.id === id) continue;
 
-		arr.push(todos[i]);
+		arr.push(elm);
 	}
 
 	todos = arr;
@@ -43,13 +43,12 @@ function removeTodo(id) {
 }
 
 function changeTodo(id) {
-	for (let i = 0; i < todos.length; i++) {
-		if (todos[i].id === id) {
-			todos[i].completed = !todos[i].completed;
-			renderTodo(currentFilter);
-			break;
-		}
-	}
+	let i = todos.findIndex((elm, index) => {
+		if (elm.id === id) return true;
+	});
+
+	todos[i].completed = !todos[i].completed;
+	renderTodo(currentFilter);
 }
 
 function renderTodo(filter) {
@@ -139,7 +138,7 @@ function filterTodo(filter) {
 function filterCompleted(flag){
 	let arr = [];
 
-	arr = todos.filter(function(item){
+	arr = todos.filter(item => {
 		return item.completed === flag;
 	});
 
@@ -148,9 +147,11 @@ function filterCompleted(flag){
 
 function getCountActive(arr) {
 	let count = 0;
-	for (let i = 0; i < arr.length; i++) {
-		if (arr[i].completed === false) count++;
-	}
+
+	arr.forEach((item) => {
+		if (item.completed === false) count++;
+	})
+
 	return count;
 }
 
@@ -159,9 +160,9 @@ function getWordItem(n) {
 }
 
 function setTodoById(id, todo) {
-	for (let i = 0; i < todos.length; i++) {
-		if (todos[i].id === id) {
-			todos[i].todo = todo;
+	for (let item of todos) {
+		if (item.id === id) {
+			item.todo = todo;
 			break;
 		}
 	}
