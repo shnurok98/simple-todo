@@ -1,22 +1,3 @@
-let todos = [
-	{
-		id: 1,
-		todo: 'Something to note',
-		completed: false
-	},
-	{
-		id: 2,
-		todo: 'Something',
-		completed: false
-	},
-	{
-		id: 3,
-		todo: 'note',
-		completed: true
-	}
-];
-
-
 let todoList = document.querySelector('.todo-list');
 let footer = document.querySelector('.footer');
 let todoCount = document.querySelector('.todo-count');
@@ -30,33 +11,24 @@ renderTodo();
 filters.addEventListener('click', changeFilter, false);
 
 function removeTodo(id) {
-	let arr = [];
-
-	for (let elm of todos){
-		if (elm.id === id) continue;
-
-		arr.push(elm);
-	}
-
-	todos = arr;
+	removeData(id);
 	renderTodo(currentFilter);
 }
 
 function changeTodo(id) {
-	let i = todos.findIndex((elm, index) => {
-		if (elm.id === id) return true;
-	});
-
-	todos[i].completed = !todos[i].completed;
+	let obj = getData(id);
+	obj.completed = !obj.completed;
+	saveData(id, obj);
 	renderTodo(currentFilter);
 }
 
 function renderTodo(filter) {
+	let todos = getAllData();
 	let count = getCountActive(todos);
-	let arr;
+
 	todoList.innerHTML = "";
 
-	arr = filterTodo(filter);
+	let arr = filterTodo(todos, filter);
 	
 	for (let i = 0; i < arr.length; i++) {
 		let li = document.createElement('li');
@@ -80,7 +52,6 @@ function renderTodo(filter) {
 	btnClear.style.visibility = count < todos.length ? 'visible' : 'hidden';
 }
 
-// TODO: валидация ввода (пробелы, html, ...)
 function addTodo(e, input) {
 	if (e.keyCode !== 13) return;
 
@@ -88,21 +59,20 @@ function addTodo(e, input) {
 	if (todoText === '') return;
 
 	let obj = {
-		id: todos.length + 1,
+		id: new Date().getTime(),
 		todo: todoText,
 		completed: false
 	};
 
-	todos.push(obj);
+	saveData(obj.id, obj);
 	input.value = "";
 	renderTodo(currentFilter);
 }
 
 function clearCompleted() {
-	// Получаем незавершенные для замены массива
-	let arr = filterCompleted(false);
+	let arr = filterCompleted(getAllData(), true);
 
-	todos = arr;
+	arr.forEach(item => removeData(item.id));
 
 	renderTodo(currentFilter);
 }
@@ -120,29 +90,29 @@ function changeFilter(){
 	renderTodo(currentFilter);
 }
 
-function filterTodo(filter) {
-	let arr;
+function filterTodo(arr, filter) {
+	let result;
 	switch(filter){
 		case 'Active':
-			arr = filterCompleted(false);
+			result = filterCompleted(arr, false);
 			break;
 		case 'Completed':
-			arr = filterCompleted(true);
+			result = filterCompleted(arr, true);
 			break;
 		default:
-			arr = todos;
+			result = arr;
 	}
-	return arr;
+	return result;
 }
 
-function filterCompleted(flag){
-	let arr = [];
+function filterCompleted(arr, flag){
+	let result = [];
 
-	arr = todos.filter(item => {
+	result = arr.filter(item => {
 		return item.completed === flag;
 	});
 
-	return arr;
+	return result;
 }
 
 function getCountActive(arr) {
@@ -160,12 +130,7 @@ function getWordItem(n) {
 }
 
 function setTodoById(id, todo) {
-	for (let item of todos) {
-		if (item.id === id) {
-			item.todo = todo;
-			break;
-		}
-	}
+	setData(id, 'todo', todo);
 }
 
 function editTodo(e) {
@@ -235,5 +200,3 @@ function setData(id, key, value) {
 	obj[key] = value;
 	saveData(id, obj);
 }
-
-console.log(getAllData());
