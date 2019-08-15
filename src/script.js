@@ -55,7 +55,7 @@ function renderTodo(filter) {
 function addTodo(e, input) {
 	if (e.keyCode !== 13) return;
 
-	todoText = validTodo(input.value);
+	let todoText = validTodo(input.value);
 	if (todoText === '') return;
 
 	let obj = {
@@ -150,7 +150,7 @@ function blurInTodo(input) {
 }
 
 function saveEdited(input) {
-	todoText = validTodo(input.value);
+	let todoText = validTodo(input.value);
 	if (todoText === '') return;
 
 	setTodoById(Number(input.dataset.todoid), todoText);
