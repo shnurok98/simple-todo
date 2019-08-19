@@ -1,3 +1,9 @@
+import Store from './store.js';
+
+const store = new Store('todos');
+
+
+let newTodo = document.querySelector('input[name="new-todo"]');
 let todoList = document.querySelector('.todo-list');
 let footer = document.querySelector('.footer');
 let todoCount = document.querySelector('.todo-count');
@@ -8,22 +14,26 @@ let currentFilter = "All";
 
 renderTodo();
 
+// Handlers
+newTodo.addEventListener('keypress', handleAddTodo, false);
 filters.addEventListener('click', changeFilter, false);
+btnClear.addEventListener('click', handleClearCompleted, false);
 
-function removeTodo(id) {
-	removeData(id);
+function handleRemoveTodo() {
+	store.remove({ id: Number(this.dataset.todoid) });
 	renderTodo(currentFilter);
 }
 
-function changeTodo(id) {
-	let obj = getData(id);
-	obj.completed = !obj.completed;
-	saveData(id, obj);
+function handleChangeTodo() {
+	store.update({
+		id: Number(this.dataset.todoid),
+		completed: this.checked
+	});
 	renderTodo(currentFilter);
 }
 
 function renderTodo(filter) {
-	let todos = getAllData();
+	let todos = store.getAll();
 	let count = getCountActive(todos);
 
 	todoList.innerHTML = "";
@@ -34,14 +44,42 @@ function renderTodo(filter) {
 		let li = document.createElement('li');
 		let checked = "";
 
-		if (arr[i].completed === true) checked = 'checked';
+		// if (arr[i].completed === true) checked = 'checked';
 
-		li.innerHTML = `
-			<input class="toggle" type="checkbox" ${checked} onchange="changeTodo(${arr[i].id})">
-			<label ondblclick="editTodo(event)">${arr[i].todo}</label>
-			<input class="edit-todo" onkeypress="saveTodo(event, this)" onblur="blurInTodo(this)" data-todoId="${arr[i].id}" type="text" name="edit-todo" value="${arr[i].todo}"/>
-			<button class="destroy" onclick="removeTodo(${arr[i].id})">×</button>
-		`;
+		// So bad code...
+		let toggle = document.createElement('input');
+		toggle.className = 'toggle';
+		toggle.type = 'checkbox';
+		if (arr[i].completed === true) toggle.checked = true;
+		toggle.setAttribute('data-todoId', arr[i].id);
+		toggle.onchange = handleChangeTodo;
+
+		let label = document.createElement('label');
+		label.innerHTML = `${arr[i].todo}`;
+		label.ondblclick = handleEditTodo;
+
+		let editInput = document.createElement('input');
+		editInput.className = 'edit-todo';
+		editInput.name = 'edit-todo';
+		editInput.setAttribute('data-todoId', arr[i].id);
+		editInput.value = `${arr[i].todo}`;
+		editInput.onkeypress = handleSaveTodo;
+		editInput.onblur = handleBlurInTodo;
+
+		let destroyBtn = document.createElement('button');
+		destroyBtn.className = 'destroy';
+		destroyBtn.setAttribute('data-todoId', arr[i].id);
+		destroyBtn.innerHTML = `×`;
+		destroyBtn.onclick = handleRemoveTodo;
+
+		// li.innerHTML = `
+		// 	<input class="toggle" type="checkbox" ${checked} onchange="changeTodo(${arr[i].id})">
+		// 	<label ondblclick="editTodo(event)">${arr[i].todo}</label>
+		// 	<input class="edit-todo" onkeypress="saveTodo(event, this)" onblur="blurInTodo(this)" data-todoId="${arr[i].id}" type="text" name="edit-todo" value="${arr[i].todo}"/>
+		// 	<button class="destroy" onclick="removeTodo(${arr[i].id})">×</button>
+		// `;
+
+		li.append(toggle, label, editInput, destroyBtn);
 
 		todoList.appendChild(li);
 
@@ -52,10 +90,10 @@ function renderTodo(filter) {
 	btnClear.style.visibility = count < todos.length ? 'visible' : 'hidden';
 }
 
-function addTodo(e, input) {
+function handleAddTodo(e) {
 	if (e.keyCode !== 13) return;
 
-	let todoText = validTodo(input.value);
+	let todoText = validTodo(this.value);
 	if (todoText === '') return;
 
 	let obj = {
@@ -64,15 +102,14 @@ function addTodo(e, input) {
 		completed: false
 	};
 
-	saveData(obj.id, obj);
-	input.value = "";
+	store.insert(obj);
+
+	this.value = "";
 	renderTodo(currentFilter);
 }
 
-function clearCompleted() {
-	let arr = filterCompleted(getAllData(), true);
-
-	arr.forEach(item => removeData(item.id));
+function handleClearCompleted() {
+	store.remove({ completed: true });
 
 	renderTodo(currentFilter);
 }
@@ -129,31 +166,27 @@ function getWordItem(n) {
 	return n === 1 ? 'item': 'items';
 }
 
-function setTodoById(id, todo) {
-	setData(id, 'todo', todo);
-}
-
-function editTodo(e) {
+function handleEditTodo(e) {
 	let input = e.target.nextElementSibling;
 	input.style.display = "block";
 	input.focus();
 }
 
-function saveTodo(e, input) {
+function handleSaveTodo(e) {
 	if (e.keyCode !== 13) return;
 	
-	saveEdited(input);
+	saveEdited(this);
 }
 
-function blurInTodo(input) {
-	saveEdited(input);
+function handleBlurInTodo() {
+	saveEdited(this);
 }
 
 function saveEdited(input) {
 	let todoText = validTodo(input.value);
 	if (todoText === '') return;
 
-	setTodoById(Number(input.dataset.todoid), todoText);
+	store.update({ id: Number(input.dataset.todoid), todo:  todoText});
 	
 	input.style.display = "none";
 	renderTodo(currentFilter);
@@ -171,32 +204,4 @@ function validTodo(text) {
 	};
 
 	return text.replace(/[&<>'"]/g, function(n) { return map[n]; });
-}
-
-
-function saveData(id, data) {
-	localStorage.setItem(String(id), JSON.stringify(data));
-}
-
-function getData(id) {
-	let obj = JSON.parse(localStorage.getItem( String(id) ));
-	return obj !== undefined ? obj: null;
-}
-
-function getAllData() {
-	let arr = [];
-	for (let i = 0; i < localStorage.length; i++) {
-		arr.push(getData( localStorage.key(i) ));
-	}
-	return arr;
-}
-
-function removeData(id) {
-	localStorage.removeItem( String(id) );
-}
-
-function setData(id, key, value) {
-	let obj = getData(id);
-	obj[key] = value;
-	saveData(id, obj);
 }
