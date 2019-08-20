@@ -61,36 +61,17 @@ export default class Store {
 		}));
 	}
 
-	getAll() {
-		return this.getLocalStorage();
+	count(cb) {
+		this.find({}, data => {
+			const total = data.length;
+
+			let i = total;
+			let completed = 0;
+
+			while(i--) {
+				completed += data[i].completed;
+			}
+			cb(total, total - completed, completed)
+		});
 	}
 }
-
-
-
-// function saveData(id, data) { +
-// 	localStorage.setItem(String(id), JSON.stringify(data));
-// }
-
-// function getData(id) {
-// 	let obj = JSON.parse(localStorage.getItem( String(id) ));
-// 	return obj !== undefined ? obj: null;
-// }
-
-// function getAllData() { +
-// 	let arr = [];
-// 	for (let i = 0; i < localStorage.length; i++) {
-// 		arr.push(getData( localStorage.key(i) ));
-// 	}
-// 	return arr;
-// }
-
-// function removeData(id) { +
-// 	localStorage.removeItem( String(id) );
-// }
-
-// function setData(id, key, value) { +
-// 	let obj = getData(id);
-// 	obj[key] = value;
-// 	saveData(id, obj);
-// }

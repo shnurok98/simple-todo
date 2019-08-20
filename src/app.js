@@ -33,12 +33,9 @@ function handleChangeTodo() {
 }
 
 function renderTodo(filter) {
-	let todos = store.getAll();
-	let count = getCountActive(todos);
-
 	todoList.innerHTML = "";
 
-	let arr = filterTodo(todos, filter);
+	let arr = filterTodo(filter);
 	
 	for (let i = 0; i < arr.length; i++) {
 		let li = document.createElement('li');
@@ -63,8 +60,7 @@ function renderTodo(filter) {
 		editInput.name = 'edit-todo';
 		editInput.setAttribute('data-todoId', arr[i].id);
 		editInput.value = `${arr[i].todo}`;
-		editInput.onkeypress = handleSaveTodo;
-		editInput.onblur = handleBlurInTodo;
+		editInput.onchange = handleSaveEdited;
 
 		let destroyBtn = document.createElement('button');
 		destroyBtn.className = 'destroy';
@@ -85,9 +81,11 @@ function renderTodo(filter) {
 
 	}
 
-	footer.style.display = todos.length > 0 ? 'flex' : 'none';
-	todoCount.innerHTML = `${count} ${getWordItem(count)} left`;
-	btnClear.style.visibility = count < todos.length ? 'visible' : 'hidden';
+	store.count((all, active, completed) => {
+		footer.style.display = all > 0 ? 'flex' : 'none';
+		todoCount.innerHTML = `${active} ${getWordItem(active)} left`;
+		btnClear.style.visibility = completed > 0 ? 'visible' : 'hidden';
+	});
 }
 
 function handleAddTodo(e) {
@@ -127,39 +125,23 @@ function changeFilter(){
 	renderTodo(currentFilter);
 }
 
-function filterTodo(arr, filter) {
+function filterTodo(filter) {
 	let result;
 	switch(filter){
 		case 'Active':
-			result = filterCompleted(arr, false);
+			store.find({ completed: false }, res => {
+				result = res;
+			});
 			break;
 		case 'Completed':
-			result = filterCompleted(arr, true);
+			store.find({ completed: true }, res => {
+				result = res;
+			});
 			break;
 		default:
-			result = arr;
+			store.find({}, res => result = res);
 	}
 	return result;
-}
-
-function filterCompleted(arr, flag){
-	let result = [];
-
-	result = arr.filter(item => {
-		return item.completed === flag;
-	});
-
-	return result;
-}
-
-function getCountActive(arr) {
-	let count = 0;
-
-	arr.forEach((item) => {
-		if (item.completed === false) count++;
-	})
-
-	return count;
 }
 
 function getWordItem(n) {
@@ -172,23 +154,13 @@ function handleEditTodo(e) {
 	input.focus();
 }
 
-function handleSaveTodo(e) {
-	if (e.keyCode !== 13) return;
-	
-	saveEdited(this);
-}
-
-function handleBlurInTodo() {
-	saveEdited(this);
-}
-
-function saveEdited(input) {
-	let todoText = validTodo(input.value);
+function handleSaveEdited() {
+	let todoText = validTodo(this.value);
 	if (todoText === '') return;
 
-	store.update({ id: Number(input.dataset.todoid), todo:  todoText});
+	store.update({ id: Number(this.dataset.todoid), todo:  todoText});
 	
-	input.style.display = "none";
+	this.style.display = "none";
 	renderTodo(currentFilter);
 }
 
