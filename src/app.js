@@ -1,7 +1,8 @@
 import Store from './store.js';
+import Template, { delegateListener } from './template.js';
 
 const store = new Store('todos');
-
+const template = new Template();
 
 let newTodo = document.querySelector('input[name="new-todo"]');
 let todoList = document.querySelector('.todo-list');
@@ -13,6 +14,13 @@ let btnClear = document.querySelector('.clear-completed');
 let currentFilter = "All";
 
 renderTodo();
+
+//	Listeners of listItem
+delegateListener(todoList, '.toggle', 'change', handleChangeTodo);
+delegateListener(todoList, 'label', 'dblclick', handleEditTodo);
+delegateListener(todoList, '.edit-todo', 'change', handleSaveEdited);
+delegateListener(todoList, '.edit-todo', 'blur', handleSaveEdited, true);
+delegateListener(todoList, '.destroy', 'click', handleRemoveTodo);
 
 // Handlers
 newTodo.addEventListener('keypress', handleAddTodo, false);
@@ -33,53 +41,9 @@ function handleChangeTodo() {
 }
 
 function renderTodo(filter) {
-	todoList.innerHTML = "";
-
 	let arr = filterTodo(filter);
 	
-	for (let i = 0; i < arr.length; i++) {
-		let li = document.createElement('li');
-		let checked = "";
-
-		// if (arr[i].completed === true) checked = 'checked';
-
-		// So bad code...
-		let toggle = document.createElement('input');
-		toggle.className = 'toggle';
-		toggle.type = 'checkbox';
-		if (arr[i].completed === true) toggle.checked = true;
-		toggle.setAttribute('data-todoId', arr[i].id);
-		toggle.onchange = handleChangeTodo;
-
-		let label = document.createElement('label');
-		label.innerHTML = `${arr[i].todo}`;
-		label.ondblclick = handleEditTodo;
-
-		let editInput = document.createElement('input');
-		editInput.className = 'edit-todo';
-		editInput.name = 'edit-todo';
-		editInput.setAttribute('data-todoId', arr[i].id);
-		editInput.value = `${arr[i].todo}`;
-		editInput.onchange = handleSaveEdited;
-
-		let destroyBtn = document.createElement('button');
-		destroyBtn.className = 'destroy';
-		destroyBtn.setAttribute('data-todoId', arr[i].id);
-		destroyBtn.innerHTML = `×`;
-		destroyBtn.onclick = handleRemoveTodo;
-
-		// li.innerHTML = `
-		// 	<input class="toggle" type="checkbox" ${checked} onchange="changeTodo(${arr[i].id})">
-		// 	<label ondblclick="editTodo(event)">${arr[i].todo}</label>
-		// 	<input class="edit-todo" onkeypress="saveTodo(event, this)" onblur="blurInTodo(this)" data-todoId="${arr[i].id}" type="text" name="edit-todo" value="${arr[i].todo}"/>
-		// 	<button class="destroy" onclick="removeTodo(${arr[i].id})">×</button>
-		// `;
-
-		li.append(toggle, label, editInput, destroyBtn);
-
-		todoList.appendChild(li);
-
-	}
+	todoList.innerHTML = template.todoList(arr);
 
 	store.count((all, active, completed) => {
 		footer.style.display = all > 0 ? 'flex' : 'none';
