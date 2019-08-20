@@ -1,5 +1,6 @@
-import Store from './store.js';
-import Template, { delegateListener } from './template.js';
+import Store from './store';
+import Template from './template';
+import { delegateListener, escapeForHTML } from './helpers'
 
 const store = new Store('todos');
 const template = new Template();
@@ -47,7 +48,7 @@ function renderTodo(filter) {
 
 	store.count((all, active, completed) => {
 		footer.style.display = all > 0 ? 'flex' : 'none';
-		todoCount.innerHTML = `${active} ${getWordItem(active)} left`;
+		todoCount.innerHTML = template.itemCounter(active);
 		btnClear.style.visibility = completed > 0 ? 'visible' : 'hidden';
 	});
 }
@@ -55,7 +56,7 @@ function renderTodo(filter) {
 function handleAddTodo(e) {
 	if (e.keyCode !== 13) return;
 
-	let todoText = validTodo(this.value);
+	let todoText = escapeForHTML(this.value);
 	if (todoText === '') return;
 
 	let obj = {
@@ -108,10 +109,6 @@ function filterTodo(filter) {
 	return result;
 }
 
-function getWordItem(n) {
-	return n === 1 ? 'item': 'items';
-}
-
 function handleEditTodo(e) {
 	let input = e.target.nextElementSibling;
 	input.style.display = "block";
@@ -119,25 +116,11 @@ function handleEditTodo(e) {
 }
 
 function handleSaveEdited() {
-	let todoText = validTodo(this.value);
+	let todoText = escapeForHTML(this.value);
 	if (todoText === '') return;
 
 	store.update({ id: Number(this.dataset.todoid), todo:  todoText});
 	
 	this.style.display = "none";
 	renderTodo(currentFilter);
-}
-
-function validTodo(text) {
-	text = text.trim();
-
-	let map = {
-		'&': '&amp;',
-   	'<': '&lt;',
-   	'>': '&gt;',
-   	'"': '&quot;',
-   	"'": '&#039;'
-	};
-
-	return text.replace(/[&<>'"]/g, function(n) { return map[n]; });
 }
