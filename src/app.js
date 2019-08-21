@@ -3,21 +3,31 @@ import Template from './template';
 import { escapeForHTML } from './helpers';
 import View from './view';
 
+import Controller from './controller';
+
 const store = new Store('todos');
 const template = new Template();
 const view = new View(template);
 
+const controller = new Controller(store, view);
+controller.setView('All');
+
+
+
+
+
+
 let currentFilter = "All";
 
-renderTodo();
+// renderTodo();
 
-view.bindAddItem(handleAddTodo);
-view.bindRemoveCompleted(handleClearCompleted);
-view.bindRemoveItem(handleRemoveTodo);
-view.bindToggleItem(handleChangeTodo);
-view.bindEditItemSave(handleSaveEdited);
-view.bindEditItem(handleEditTodo);
-view.bindChangeFilter(handleChangeFilter);
+// view.bindAddItem(handleAddTodo);
+// view.bindRemoveCompleted(handleClearCompleted);
+// view.bindRemoveItem(handleRemoveTodo);
+// view.bindToggleItem(handleChangeTodo);
+// view.bindEditItemSave(handleSaveEdited);
+// view.bindEditItem(handleEditTodo);
+// view.bindChangeFilter(handleChangeFilter);
 
 function handleRemoveTodo(id) {
 	store.remove({ id: id });

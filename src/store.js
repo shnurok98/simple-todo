@@ -14,13 +14,15 @@ export default class Store {
 		};
 	}
 
-	insert(item) {
+	insert(item, cb) {
 		const todos = this.getLocalStorage();
 		todos.push(item);
 		this.setLocalStorage(todos);
+
+		if (cb) cb();
 	}
 
-	update(newItem) {
+	update(newItem, cb) {
 		const id = newItem.id;
 		const todos = this.getLocalStorage();
 
@@ -34,9 +36,10 @@ export default class Store {
 		}
 
 		this.setLocalStorage(todos);
+		if (cb) cb();
 	}
 
-	remove(query) {
+	remove(query, cb) {
 		const todos = this.getLocalStorage().filter(todo => {
 			for (let key in query) {
 				if (query[key] !== todo[key]) return true;
@@ -45,6 +48,7 @@ export default class Store {
 		});
 
 		this.setLocalStorage(todos);
+		if (cb) cb();
 	}
 
 	find(query, cb) {
