@@ -16,15 +16,14 @@ export default class View {
 		this.todoList.innerHTML = this.template.itemList(items);
 	}
 
-	editItem(e) {
-		const input = e.target.nextElementSibling;
-		input.style.display = "block";
-		input.focus();
+	editItem(target) {
+		target.style.display = "block";
+		target.focus();
 	}
 
 	removeItem(id) {
 		const listItem = document.querySelector(`[data-todoid="${id}"]`).parentElement;
-		this.todoList.remove(listItem);
+		this.todoList.removeChild(listItem);
 	}
 
 	setItemsCounter(count) {
@@ -50,7 +49,6 @@ export default class View {
 		this.newTodo.value = '';
 	}
 
-	// Need???
 	setItemComplete(id, completed) {
 		document.querySelector(`.toggle[data-todoid="${id}"]`).checked = completed;
 	}
@@ -63,7 +61,7 @@ export default class View {
 
 
 	bindAddItem(handler) {
-		this.newTodo.addEventListener('keypress', ({ target }) => {
+		this.newTodo.addEventListener('change', ({ target }) => {
 			const todo = target.value.trim();
 			if (todo) {
 				handler(todo);
@@ -82,7 +80,6 @@ export default class View {
 	}
 
 	bindToggleItem(handler) {
-		// target.checked ???
 		delegateListener(this.todoList, '.toggle', 'change', ({ target }) => {
 			handler(Number(target.dataset.todoid), target.checked);
 		});
@@ -96,6 +93,20 @@ export default class View {
 		delegateListener(this.todoList, '.edit-todo', 'change', ({ target }) => {
 			target.blur();
 		});
+	}
+
+	bindEditItem(handler) {
+		delegateListener(this.todoList, 'label', 'dblclick', ({ target }) => {
+			handler(target.nextElementSibling);
+		});
+	}
+
+	bindChangeFilter(handler) {
+		this.filters.addEventListener('click', ({ target }) => {
+			const filter = target.closest('li');
+			if (filter === null) return;
+			handler(filter);
+		}, false);
 	}
 }
 // убрал trim() из escapeFromHTML()

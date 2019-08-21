@@ -1,62 +1,77 @@
 import Store from './store';
 import Template from './template';
-import { delegateListener, escapeForHTML } from './helpers';
+import { escapeForHTML } from './helpers';
+import View from './view';
 
 const store = new Store('todos');
 const template = new Template();
+const view = new View(template);
 
-let newTodo = document.querySelector('input[name="new-todo"]');
-let todoList = document.querySelector('.todo-list');
-let footer = document.querySelector('.footer');
-let todoCount = document.querySelector('.todo-count');
-let filters = document.querySelector('.filters');
-let btnClear = document.querySelector('.clear-completed');
+
+// let newTodo = document.querySelector('input[name="new-todo"]');
+// let todoList = document.querySelector('.todo-list');
+// let footer = document.querySelector('.footer');
+// let todoCount = document.querySelector('.todo-count');
+// let filters = document.querySelector('.filters');
+// let btnClear = document.querySelector('.clear-completed');
 
 let currentFilter = "All";
 
 renderTodo();
 
 //	Listeners of listItem
-delegateListener(todoList, '.toggle', 'change', handleChangeTodo);
-delegateListener(todoList, 'label', 'dblclick', handleEditTodo);
-delegateListener(todoList, '.edit-todo', 'change', handleSaveEdited);
-delegateListener(todoList, '.edit-todo', 'blur', handleSaveEdited, true);
-delegateListener(todoList, '.destroy', 'click', handleRemoveTodo);
+// delegateListener(todoList, '.toggle', 'change', handleChangeTodo);
+// delegateListener(todoList, 'label', 'dblclick', handleEditTodo);
+// delegateListener(todoList, '.edit-todo', 'change', handleSaveEdited);
+// delegateListener(todoList, '.edit-todo', 'blur', handleSaveEdited, true);
+// delegateListener(todoList, '.destroy', 'click', handleRemoveTodo);
 
 // Handlers
-newTodo.addEventListener('keypress', handleAddTodo, false);
-filters.addEventListener('click', changeFilter, false);
-btnClear.addEventListener('click', handleClearCompleted, false);
+// newTodo.addEventListener('change', handleAddTodo, false);
+// filters.addEventListener('click', changeFilter, false);
+// btnClear.addEventListener('click', handleClearCompleted, false);
 
-function handleRemoveTodo() {
-	store.remove({ id: Number(this.dataset.todoid) });
+view.bindAddItem(handleAddTodo);
+view.bindRemoveCompleted(handleClearCompleted);
+view.bindRemoveItem(handleRemoveTodo);
+view.bindToggleItem(handleChangeTodo);
+view.bindEditItemSave(handleSaveEdited);
+view.bindEditItem(handleEditTodo);
+view.bindChangeFilter(handleChangeFilter);
+
+function handleRemoveTodo(id) {
+	store.remove({ id: id });
 	renderTodo(currentFilter);
+	view.removeItem(id);
 }
 
-function handleChangeTodo() {
+function handleChangeTodo(id, completed) {
 	store.update({
-		id: Number(this.dataset.todoid),
-		completed: this.checked
+		id: id,
+		completed: completed
 	});
+	view.setItemComplete(id, completed);
 	renderTodo(currentFilter);
 }
 
 function renderTodo(filter) {
 	let arr = filterTodo(filter);
 	
-	todoList.innerHTML = template.itemList(arr);
+	// todoList.innerHTML = template.itemList(arr);
+	view.showItems(arr);
 
 	store.count((all, active, completed) => {
-		footer.style.display = all > 0 ? 'flex' : 'none';
-		todoCount.innerHTML = template.itemCounter(active);
-		btnClear.style.visibility = completed > 0 ? 'visible' : 'hidden';
+		view.setFooterVisibility(all > 0);
+		// footer.style.display = all > 0 ? 'flex' : 'none';
+		// todoCount.innerHTML = template.itemCounter(active);
+		view.setItemsCounter(active);
+		view.setClearButtonVisibility(completed > 0)
+		// btnClear.style.visibility = completed > 0 ? 'visible' : 'hidden';
 	});
 }
 
-function handleAddTodo(e) {
-	if (e.keyCode !== 13) return;
-
-	let todoText = escapeForHTML(this.value);
+function handleAddTodo(todo) {
+	let todoText = escapeForHTML(todo);
 	if (todoText === '') return;
 
 	let obj = {
@@ -67,7 +82,7 @@ function handleAddTodo(e) {
 
 	store.insert(obj);
 
-	this.value = "";
+	view.clearNewTodo();
 	renderTodo(currentFilter);
 }
 
@@ -77,14 +92,9 @@ function handleClearCompleted() {
 	renderTodo(currentFilter);
 }
 
-function changeFilter(){
-	let target = event.target.closest('li');
-	if (target === null) return;
+function handleChangeFilter(target){
+	view.updateFilterButtons(target);
 
-	let oldSelect = document.querySelector('.filters .selected');
-	oldSelect.classList.toggle('selected');
-	
-	target.classList.toggle('selected');
 	currentFilter = target.textContent;
 
 	renderTodo(currentFilter);
@@ -109,18 +119,16 @@ function filterTodo(filter) {
 	return result;
 }
 
-function handleEditTodo(e) {
-	let input = e.target.nextElementSibling;
-	input.style.display = "block";
-	input.focus();
+function handleEditTodo(target) {
+	view.editItem(target);
 }
 
-function handleSaveEdited() {
-	let todoText = escapeForHTML(this.value);
+function handleSaveEdited(id, todo) {
+	let todoText = escapeForHTML(todo);
 	if (todoText === '') return;
 
-	store.update({ id: Number(this.dataset.todoid), todo:  todoText});
+	store.update({ id: id, todo: todo});
 	
-	this.style.display = "none";
+	// view.editItemDone(id, todo);
 	renderTodo(currentFilter);
 }
