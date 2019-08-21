@@ -39,8 +39,6 @@ export default class View {
 	}
 
 	updateFilterButtons(target) {
-		// let target = event.target.closest('li');
-		// if (target === null) return;
 		document.querySelector('.filters .selected').classList.toggle('selected');
 		target.classList.toggle('selected');
 	}
@@ -109,4 +107,3 @@ export default class View {
 		}, false);
 	}
 }
-// убрал trim() из escapeFromHTML()
