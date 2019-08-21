@@ -1,6 +1,6 @@
 import Store from './store';
 import Template from './template';
-import { delegateListener, escapeForHTML } from './helpers'
+import { delegateListener, escapeForHTML } from './helpers';
 
 const store = new Store('todos');
 const template = new Template();
@@ -44,7 +44,7 @@ function handleChangeTodo() {
 function renderTodo(filter) {
 	let arr = filterTodo(filter);
 	
-	todoList.innerHTML = template.todoList(arr);
+	todoList.innerHTML = template.itemList(arr);
 
 	store.count((all, active, completed) => {
 		footer.style.display = all > 0 ? 'flex' : 'none';

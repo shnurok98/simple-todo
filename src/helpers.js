@@ -16,8 +16,6 @@ export function delegateListener(target, selector, type, handler, capture) {
 }
 
 export function escapeForHTML(text) {
-	text = text.trim();
-
 	const map = {
 		'&': '&amp;',
    	'<': '&lt;',

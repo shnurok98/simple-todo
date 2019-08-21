@@ -1,5 +1,5 @@
 export default class Template {
-	todoList(items) {
+	itemList(items) {
 		return items.reduce((html, item) => html + `
 			<li>
 				<input class="toggle" type="checkbox" data-todoid="${item.id}" ${item.completed ? 'checked': ''}>
