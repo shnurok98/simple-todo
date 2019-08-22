@@ -9,19 +9,18 @@ export default class Controller {
 		this._activeFilter = 'All';
 		this._lastActiveFilter = null;
 
+		view.bindChangeFilter(this.setView.bind(this));
 		view.bindAddItem(this.addItem.bind(this));
 		view.bindRemoveCompleted(this.removeCompletedItems.bind(this));
 		view.bindRemoveItem(this.removeItem.bind(this));
 		view.bindToggleItem(this.toggleCompleted.bind(this));
 		view.bindEditItemSave(this.editItemSave.bind(this));
-		view.bindEditItem(this.editItem.bind(this));
-		view.bindChangeFilter(this.handleChangeFilter.bind(this));
 	}
 
 	setView(filter) {
+		this.view.updateFilterButtons(filter);
 		this._activeFilter = filter;
 		this._filter();
-		// this.view.updateFilterButtons(filter); // в метод передается HTML Elemnt
 	}
 
 	addItem(todo) {
@@ -31,7 +30,7 @@ export default class Controller {
 			completed: false
 		}, () => {
 			this.view.clearNewTodo();
-			this._filter(true);// нету метода у View для добавления
+			this._filter(true);
 		});
 	}
 
@@ -50,14 +49,14 @@ export default class Controller {
 
 	removeItem(id) {
 		this.store.remove({ id }, () => {
-			this._filter(); // check this
+			this._filter();
 			this.view.removeItem(id);
 		});
 	}
 
 	removeCompletedItems() {
 		this.store.remove({ completed: true }, () => {
-			this._filter(true); // check this
+			this._filter(true);
 		});
 	}
 
@@ -68,22 +67,9 @@ export default class Controller {
 		});
 	}
 
-	// Not ok! It's should be in view!
-	editItem(target) {
-		this.view.editItem(target);
-	}
-
-	// Not ok! target is a HTML Element!
-	handleChangeFilter(target){
-		this.view.updateFilterButtons(target);
-
-		this.setView(target.textContent);
-	}
-
 	_filter(force) {
 		const filter = this._activeFilter;
 
-		//  this._lastActiveRoute !== ''  ??? in middle
 		if (force || this._lastActiveFilter !== 'All' || this._lastActiveFilter !== filter) {
 			this.store.find({
 				'All': {},

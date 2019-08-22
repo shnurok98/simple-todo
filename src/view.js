@@ -10,6 +10,10 @@ export default class View {
 		this.todoCount = document.querySelector('.todo-count');
 		this.filters = document.querySelector('.filters');
 		this.btnClear = document.querySelector('.clear-completed');
+
+		delegateListener(this.todoList, 'label', 'dblclick', ({ target }) => {
+			this.editItem(target.nextElementSibling);
+		});
 	}
 
 	showItems(items) {
@@ -22,8 +26,11 @@ export default class View {
 	}
 
 	removeItem(id) {
-		const listItem = document.querySelector(`[data-todoid="${id}"]`).parentElement;
-		this.todoList.removeChild(listItem);
+		const listItem = this.todoList.querySelector(`[data-todoid="${id}"]`);
+		
+		if (listItem) {
+			this.todoList.removeChild(listItem.parentElement);
+		}
 	}
 
 	setItemsCounter(count) {
@@ -38,9 +45,9 @@ export default class View {
 		this.footer.style.display = !!visible ? 'flex' : 'none';
 	}
 
-	updateFilterButtons(target) {
-		document.querySelector('.filters .selected').classList.toggle('selected');
-		target.classList.toggle('selected');
+	updateFilterButtons(filter) {
+		this.filters.querySelector('.selected').classList.toggle('selected');
+		this.filters.querySelector(`[data-filter="${filter}"]`).classList.toggle('selected');
 	}
 
 	clearNewTodo() {
@@ -48,11 +55,11 @@ export default class View {
 	}
 
 	setItemComplete(id, completed) {
-		document.querySelector(`.toggle[data-todoid="${id}"]`).checked = completed;
+		this.todoList.querySelector(`.toggle[data-todoid="${id}"]`).checked = completed;
 	}
 
 	editItemDone(id, todo) {
-		const input = document.querySelector(`.edit-todo[data-todoid="${id}"]`);
+		const input = this.todoList.querySelector(`.edit-todo[data-todoid="${id}"]`);
 		input.previousElementSibling.textContent = todo;
 		input.style.display = "none";
 	}
@@ -93,17 +100,12 @@ export default class View {
 		});
 	}
 
-	bindEditItem(handler) {
-		delegateListener(this.todoList, 'label', 'dblclick', ({ target }) => {
-			handler(target.nextElementSibling);
-		});
-	}
-
 	bindChangeFilter(handler) {
 		this.filters.addEventListener('click', ({ target }) => {
-			const filter = target.closest('li');
-			if (filter === null) return;
-			handler(filter);
+			const filter = target.closest('li').dataset.filter;
+			if (filter) {
+				handler(filter);
+			}
 		}, false);
 	}
 }
