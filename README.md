@@ -1,4 +1,5 @@
 # Простой список дел
 
-TODO: Use ES6!  
-TODO: Оформить readme
+TODO: Оформить readme  
+TODO: Добавить margin-bottom для .wrapper  
+TODO: Добавить padding для placeholder
